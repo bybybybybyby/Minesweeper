@@ -14,7 +14,7 @@ public class Main {
 
         while(!valid) {
             try {
-                numOfMines = Integer.valueOf(sc.nextLine());
+                numOfMines = Integer.parseInt(sc.nextLine());
                 valid = true;
             } catch (NumberFormatException e) {
                 System.out.println("Please enter a number");
@@ -23,7 +23,7 @@ public class Main {
 
         minefield = new Minefield(numOfMines);
         minefield.plantMines();
-
+        minefield.countNearbyMines();
         minefield.print();
 
     }
