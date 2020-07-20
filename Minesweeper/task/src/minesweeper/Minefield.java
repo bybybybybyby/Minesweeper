@@ -1,28 +1,29 @@
 package minesweeper;
 
 import java.awt.*;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 public class Minefield {
 
     private int numOfMines;
     private String[][] minefield;
     private Set<Point> mineLocations;
+    private Set<Point> mineGuesses;
     private static final int FIELD_SIZE = 9;
+    private boolean hideMines;
 
     // Constructor
     public Minefield(int numOfMines) {
         this.numOfMines = numOfMines;
+        this.mineGuesses = new HashSet<>();
         minefield = new String[FIELD_SIZE][FIELD_SIZE];
         for (String[] s : minefield) {
             Arrays.fill(s, "");
         }
+        this.hideMines = true;
     }
 
-     // Set random mine location points
+    // Set random mine location points
     public void plantMines() {
         mineLocations = new HashSet<>();
         Random random = new Random();
@@ -32,7 +33,11 @@ public class Minefield {
             int y = random.nextInt(FIELD_SIZE);
             Point p = new Point(x, y);
             mineLocations.add(p);
-            minefield[x][y] = "X";
+            if (hideMines) {
+                minefield[x][y] = ".";
+            } else {
+                minefield[x][y] = "X";
+            }
         }
     }
 
@@ -62,7 +67,8 @@ public class Minefield {
                     // Check points and count mines
                     int surroundingMines = 0;
                     for (Point p : checkPoints) {
-                        if (minefield[p.x][p.y].contains("X")) {
+//                        if (minefield[p.x][p.y].contains("X")) {
+                        if (mineLocations.contains(p)) {
                             surroundingMines++;
                         }
                     }
@@ -75,14 +81,58 @@ public class Minefield {
         }
     }
 
-    // Print out minefield
-    public void print() {
-        for (int i = 0; i < FIELD_SIZE; i++) {
-            for (int j = 0; j < FIELD_SIZE; j++) {
-                System.out.print(minefield[i][j]);
+    // Set/delete mine marks
+    public void setMark(Scanner sc) {
+        while (true) {
+            System.out.println("Set/delete mines marks (x and y coordinates): ");
+            int y = sc.nextInt() - 1;  //Coordinates show 1 higher than array index
+            int x = sc.nextInt() - 1;
+            if (minefield[x][y].matches("\\d")) {
+                System.out.println("There is a number here!");
+            } else {
+//                System.out.println("x="+x+" y=" + y + " minefield=" + minefield[x][y]);
+//                minefield[x][y] = (minefield[x][y].equals(".")) ? "*" : ".";
+                Point p = new Point(x, y);
+                switch(minefield[x][y]) {
+                    case ".":
+                        minefield[x][y] = "*";
+                        mineGuesses.add(p);
+                        break;
+                    case "*":
+                        minefield[x][y] = ".";
+                        mineGuesses.remove(p);
+                        break;
                 }
-            System.out.println();
+
+                break;
             }
         }
+    }
+
+    // Check if all guesses match mine locations, if so game is won.
+    public boolean checkForWinner() {
+        if (mineGuesses.equals(mineLocations)) {
+            System.out.println("Congratulations! You found all mines!");
+            return true;
+        }
+        return false;
+    }
+
+    // Print out minefield
+    public void print() {
+        // Print header
+        System.out.println(" │123456789│\n—│—————————│");
+        // Print minefield with rows
+        for (int i = 0; i < FIELD_SIZE; i++) {
+            System.out.print((i + 1) + "|");
+            for (int j = 0; j < FIELD_SIZE; j++) {
+                System.out.print(minefield[i][j]);
+            }
+            System.out.println("|");
+        }
+        // Print footer
+        System.out.println("—│—————————│");
+    }
+
 
 }

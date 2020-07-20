@@ -11,6 +11,7 @@ public class Main {
         System.out.print("How many mines do you want on the field? ");
         // TODO: check if mines are less than field size
         boolean valid = false;
+        boolean winner = false;
 
         while(!valid) {
             try {
@@ -24,7 +25,13 @@ public class Main {
         minefield = new Minefield(numOfMines);
         minefield.plantMines();
         minefield.countNearbyMines();
-        minefield.print();
 
+        while(!winner) {
+            minefield.print();
+            minefield.setMark(sc);
+            if (minefield.checkForWinner()) {
+                winner = true;
+            }
+        }
     }
 }
