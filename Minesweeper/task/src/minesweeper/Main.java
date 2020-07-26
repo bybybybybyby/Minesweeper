@@ -28,7 +28,11 @@ public class Main {
 
         while(!winner) {
             minefield.print();
-            minefield.setMark(sc);
+            boolean safe = minefield.userInput(sc);
+            if (!safe) {
+                System.out.println("You stepped on a mine and failed!");
+                break;
+            }
             if (minefield.checkForWinner()) {
                 winner = true;
             }
